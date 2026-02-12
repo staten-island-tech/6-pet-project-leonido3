@@ -7,8 +7,9 @@ class cat:
         self.smart = smart
         self.stamina = stamina
     def study(self, happy, smart, stamina):
+        print(f"{pname} hits the books. He gets pretty tired!")
         self.smart += smart
-        self.happy += happy
+        self.happy -= happy
         self.stamina -= stamina
     def play(self, happy, stamina):
         if game == "poker":
@@ -31,13 +32,51 @@ class cat:
             print(f"You play {game} with {self.name}. He got a little tired, but he is much happier now!")
             self.happy += happy
             self.stamina -= stamina
-    def yummy(self, happy, stamina, hp):
-        self.happy += happy
-        self.stamina += stamina
-        self.hp += hp
-    def gaming(self, happy, stamina, smart):
-        self.smart -= smart
-        self.happy += happy
+    def yummy(self, happy, stamina, hp, smart):
+        loop = True
+        if person.inv[0]["count"] != 0 or person.inv[1]["count"] != 0 or person.inv[2]["count"] != 0:
+            while loop:
+                givefood = input(f"What do you want to feed {self.name}? " +
+                                f"You have {person.inv[0]["count"]} gourmet food, {person.inv[1]["count"]} smartening food, and " +
+                                f"{person.inv[2]["count"]} normal food. ")
+                if givefood == "gourmet" and person.inv[0]["count"] != 0:
+                    person.inv[0]["count"] -= 1
+                    print(f"You give {self.name} some food. You now have {person.inv[0]["count"]} gourmet food. He enjoyed it and became much happier.")
+                    loop = False
+                    self.happy += happy*2
+                    self.stamina += stamina
+                    self.hp += hp*2
+                elif person.inv[0]["count"] == 0:
+                    feedloop = input(f"You don't have enough food! Do you want to feed {pname} some other food? (y/n)")
+                    if feedloop == "n":
+                        loop = False
+                if givefood == "smartening" and person.inv[1]["count"] != 0:
+                    person.inv[1]["count"] -= 1
+                    print(f"You give {self.name} some food. The food tastes horrible, but at least he's smarter now. You now have {person.inv[1]["count"]} smartening food. ")
+                    loop = False
+                    self.happy -= happy*2
+                    self.stamina += stamina
+                    self.hp += hp
+                    self.smart += smart*2
+                elif person.inv[1]["count"] == 0:
+                    feedloop = input(f"You don't have enough food! Do you want to feed {pname} some other food? (y/n)")
+                    if feedloop == "n":
+                        loop = False
+                if givefood == "normal" and person.inv[2]["count"] != 0:
+                    person.inv[2]["count"] -= 1
+                    print(f"You give {self.name} some food. You now have {person.inv[2]["count"]} normal food.")
+                    loop = False
+                    self.happy += happy
+                    self.stamina += stamina
+                    self.hp += hp
+                elif person.inv[2]["count"] == 0:
+                    feedloop = input(f"You don't have enough food! Do you want to feed {pname} some other food? (y/n)") 
+                    if feedloop == "n":
+                        loop = False    
+        else:
+            print(f"You don't have enough food to feed {self.name}. Would you like to go to the store")                
+    def ignore(self, happy, stamina):
+        self.happy -= happy
         self.stamina -= stamina
 class player:
     def __init__(user, uname, money, inv):
@@ -69,38 +108,45 @@ class player:
             countfood = 0
             if gostore == "y":
                 choosefood = int(input(
-                     f"You have {inv[0]['count']} gourmet food, {inv[1]['count']} smartening food, and {inv[2]['count']} normal food."
-                     " You can buy the following foods: Gourmet ($10/serving), "+
-                     "Smartening ($15/serving), "+
-                     "Normal ($5/serving), "+
-                     "      Choose (1/2/3): "
+                     f"You have {inv[0]["count"]} gourmet food, {inv[1]["count"]} smartening food, and {inv[2]["count"]} normal food."
+                     " You can buy the following foods: gourmet ($10/serving), "+
+                     "smartening ($15/serving), "+
+                     "normal ($5/serving), "+
+                     "      Choose: "
                                     ))
-                countfood = int(input(f"How much {inv[choosefood-1]['type']} food do you want to buy? "))
+                if choosefood == "gourmet":
+                    choosefood = 1
+                elif choosefood == "smartening":
+                    choosefood = 2
+                elif choosefood == "normal":
+                    choosefood = 3
+                countfood = int(input(f"How much {inv[choosefood-1]["type"]} food do you want to buy? "))
                 total_cost = countfood * inv[choosefood-1]['price']
                 if total_cost > user.money:
                         dontstop = input("You are broke and can't buy that! Try again? (y/n)")
                         if dontstop == "n":
                             shopping = False
                 else:
-                    inv[choosefood-1]['count'] += countfood
+                    inv[choosefood-1]["count"] += countfood
                     user.money -= total_cost
                     print(f"Good job. You aren't broke and can buy that. Your balance is ${user.money}.")
                     break
 games = ["fortnite", "fetch", "tag", "poker", "hide and seek"]
+day = 0
 stuff = [
     {
         "type": "gourmet",
-        "count": 0,
+        "count": 10,
         "price": 10,
     },
     {
         "type": "smartening",
-        "count": 0,
+        "count": 10,
         "price": 15,
     },
     {
         "type": "normal",
-        "count": 2,
+        "count": 10,
         "price": 5
     }
 ]
@@ -109,5 +155,8 @@ pname = input("Name your pet. ")
 pet = cat(pname, 100, 50, 0, 50)
 person = player(uname, 100, stuff)
 petalive = True
-game = games[random.randint(0, 5)]
-pet.play(pet.happy, pet.stamina)
+pet.yummy(pet.happy, pet.stamina, pet.hp, pet.smart)
+while petalive:
+    game = games[random.randint(0, 4)]
+    day += 1
+    print(f"Today is day {}")
