@@ -285,9 +285,8 @@ def workfunc():
             "(Minimum wage disabled)")
 def storefunc():
     global items_brought, stuyboost
-    newshopping = True
     gostore = input("Do you want to buy something? (y/n) ")
-    academic_items = {
+    academic_items = [
             {"name": "high school textbooks", 
             "price": 50, 
             "boost": 0.3, 
@@ -308,52 +307,45 @@ def storefunc():
             "boost": 2.5, 
             "req": 300
             },
-    }
+    ]
     if gostore == "y":
-        while newshopping:
+        shopping = True
+        while shopping:
             typestore = input("Would you like to go to the academic store or the food store? ")
             if typestore == "academic":
-                print("You can buy:")
-                for i, item in academic_items.items():
-                    if item["req"] > 0:
-                        print(f"{i}) the {item['name']} for ${item['price']} "+
-                              f"(requires {item['req']}+ intellect) "+
-                              f"(and gives {1 + item['boost']}* boost to studying)")
-                    else:
-                        print(f"{i}) the {item['name']} for ${item['price']} "
-                              f"({1 + item['boost']}* boost to studying)")
-                buything = int(input("What would you like to buy? (1/2/3/4) "))
-                if buything in academic_items:
-                    item = academic_items[buything]
-                    if buything in items_brought:
-                        again = input("You already have that boost! Try buying something else? (y/n) ")
-                        if again == "n":
-                            newshopping = False
-                        continue
-                    if pet.smart < item["req"]:
-                        again = input(f"{pet.name}'s intellect is too low! Try something else? (y/n) ")
-                        if again == "n":
-                            newshopping = False
-                        continue
-                    if person.money < item["price"]:
-                        again = input("Not enough money. Try something else? (y/n) ")
-                        if again == "n":
-                            newshopping = False
-                        continue
-                    items_brought.append(buything)
-                    stuyboost += item["boost"]
-                    person.money -= item["price"]
-                    print(f"You bought the {item['name']}! "+
-                          f"+{1 + item['boost']} boost to learning")
-                    newshopping = False
+                for i in range(academic_items):
+                    print(f"{i+1}) You can buy {academic_items[i]["name"]} for {academic_items[i]["price."]}")
+                    print(f"It will boost studying by {academic_items[i]["boost"]}, and requires {academic_items[i]["req"]} intellect.")
+                itemselect = int(input("What would you like to buy? (1/2/3/4) "))
+                if academic_items[itemselect]["price."] <= person.money and pet.smart > academic_items[i]["req"] and academic_items[i]["name"] not in items_brought:
+                    person.money -= academic_items[i]["price."]
+                    stuyboost += academic_items[i]["boost"]
+                    items_brought.append(academic_items[i]["name"])
+                    shopping = False
+                    print(f"You brought the {academic_items[i]["name"]}. Your balance is now {person.money}.")
+                elif academic_items[i]["name"] in items_brought:
+                    print("You already have that boost? ")
+                    stop = input("Keep shopping? (y/n) ")
+                    if stop == "y":
+                        shopping = False
+                elif academic_items[itemselect]["price."] > person.money:
+                    print("You're too broke to buy that. ")
+                    stop = input("Keep shopping? (y/n) ")
+                    if stop == "y":
+                        shopping = False
+                elif pet.smart > academic_items[i]["req"]:
+                    print(f"{pet.name} is not smart enough to buy that! ")
+                    stop = input("Keep shopping? (y/n) ")
+                    if stop == "y":
+                        shopping = False
             elif typestore == "food":
-                shopping = True
-                while shopping:
+                shopping2 = True
+                while shopping2:
                     choosefood = input(
                         f"You have {person.inv[0]['count']} gourmet food, "+
                         f"{person.inv[1]['count']} smartening food, and "+
                         f"{person.inv[2]['count']} normal food. "+
-                        "Choose: gourmet / smartening / normal "
+                        "Choose food you want to buy:  "
                     )
                     if choosefood == "gourmet":
                         choosefood = 1
@@ -365,16 +357,16 @@ def storefunc():
                         f"How much {person.inv[choosefood-1]['type']} food do you want to buy? "
                     ))
                     total_cost = countfood * person.inv[choosefood-1]['price']
+                    shopping2 = False
                     if total_cost > person.money:
                         dontstop = input("Not enough money! Try again? (y/n) ")
                         if dontstop == "n":
-                            shopping = False
+                            shopping2 = False
                     else:
                         person.inv[choosefood-1]["count"] += countfood
                         person.money -= total_cost
                         print(f"Purchased! Balance: ${person.money}")
-                        shopping = False
-                        newshopping = False
+                        shopping2 = False
 while petalive:
     game = games[random.randint(0, 4)]
     day += 1
